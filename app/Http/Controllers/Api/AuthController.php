@@ -68,4 +68,35 @@ class AuthController extends Controller
             'user' => $user,
         ]);
     }
+
+    public function phoneLogin(Request $request)
+    {
+        $credentials = $request->only('phone', 'password');
+
+        $validator = Validator::make($credentials, [
+            'phone' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Find the user by phone number
+        $user = User::where('phone', $request->phone)->first();
+
+        // Check if user exists and the password is correct
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json(['message' => 'Invalid credentials'], 401);
+        }
+
+        // Generate a JWT token for the authenticated user
+        $token = JWTAuth::fromUser($user);
+
+        return response()->json([
+            'message' => 'Login successful',
+            'token' => $token,
+            'user' => $user,
+        ]);
+    }
 }

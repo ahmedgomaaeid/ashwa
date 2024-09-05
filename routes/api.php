@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('register', [App\Http\Controllers\Api\AuthController::class, 'register']);
 Route::post('login', [App\Http\Controllers\Api\AuthController::class, 'login']);
+Route::post('phonelogin', [App\Http\Controllers\Api\AuthController::class, 'phoneLogin']);
 
 Route::middleware(['jwt.verify'])->group(function () {
     // Protected routes
