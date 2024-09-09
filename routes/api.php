@@ -17,12 +17,16 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::group(['prefix' => 'auth'], function () {
+    Route::post('register', [App\Http\Controllers\Api\AuthController::class, 'register']);
+    Route::post('login', [App\Http\Controllers\Api\AuthController::class, 'login']);
+    Route::post('phonelogin', [App\Http\Controllers\Api\AuthController::class, 'phoneLogin']);
+});
 
-Route::post('register', [App\Http\Controllers\Api\AuthController::class, 'register']);
-Route::post('login', [App\Http\Controllers\Api\AuthController::class, 'login']);
-Route::post('phonelogin', [App\Http\Controllers\Api\AuthController::class, 'phoneLogin']);
+Route::group(['prefix' => 'public'], function () {
+    Route::get('categories', [App\Http\Controllers\Api\CategoryController::class, 'index']);
+});
 
-Route::get('categories', [App\Http\Controllers\Api\CategoryController::class, 'index']);
 
 Route::middleware(['jwt.verify'])->group(function () {
     // Protected routes
