@@ -22,6 +22,8 @@ Route::post('register', [App\Http\Controllers\Api\AuthController::class, 'regist
 Route::post('login', [App\Http\Controllers\Api\AuthController::class, 'login']);
 Route::post('phonelogin', [App\Http\Controllers\Api\AuthController::class, 'phoneLogin']);
 
+Route::get('categories', [App\Http\Controllers\Api\CategoryController::class, 'index']);
+
 Route::middleware(['jwt.verify'])->group(function () {
     // Protected routes
     Route::get('/test', function () {
