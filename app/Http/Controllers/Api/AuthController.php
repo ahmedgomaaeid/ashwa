@@ -169,4 +169,29 @@ class AuthController extends Controller
         return response()->json(['message' => 'Phone number verified successfully.']);
     }
 
+    public function sendAgain(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|string',
+        ]);
+
+        $user = User::where('phone', $request->phone)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
+        // Attempt to send the verification code to the user's phone
+        try {
+            $this->sendVerificationCode($user);
+        } catch (\Exception $e) {
+            // Handle errors when sending the verification code
+            return response()->json([
+                'message' => 'Failed to send verification code.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+
+        return response()->json(['message' => 'Verification code sent successfully.']);
+    }
 }

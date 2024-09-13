@@ -22,11 +22,13 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('login', [App\Http\Controllers\Api\AuthController::class, 'login']);
     Route::post('phonelogin', [App\Http\Controllers\Api\AuthController::class, 'phoneLogin']);
     Route::post('verify-code', [App\Http\Controllers\Api\AuthController::class, 'verifyCode']);
+    Route::post('send-again',[App\Http\Controllers\Api\AuthController::class, 'sendAgain']);
 });
 
 Route::group(['prefix' => 'public'], function () {
     Route::get('categories', [App\Http\Controllers\Api\CategoryController::class, 'index']);
     Route::get('products/{id}', [App\Http\Controllers\Api\CategoryController::class, 'products']);
+    Route::get('search', [App\Http\Controllers\Api\CategoryController::class, 'search']);
 });
 
 
