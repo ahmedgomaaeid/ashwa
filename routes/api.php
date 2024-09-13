@@ -21,6 +21,7 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('register', [App\Http\Controllers\Api\AuthController::class, 'register']);
     Route::post('login', [App\Http\Controllers\Api\AuthController::class, 'login']);
     Route::post('phonelogin', [App\Http\Controllers\Api\AuthController::class, 'phoneLogin']);
+    Route::post('verify-code', [App\Http\Controllers\Api\AuthController::class, 'verifyCode']);
 });
 
 Route::group(['prefix' => 'public'], function () {
@@ -28,10 +29,10 @@ Route::group(['prefix' => 'public'], function () {
 });
 
 
-Route::middleware(['jwt.verify'])->group(function () {
+Route::middleware(['jwt.verify', 'check.verified'])->group(function () {
     // Protected routes
     Route::get('/test', function () {
-        return response()->json(['message' => 'This is a protected route']);
+        return response()->json(['message' => 'Now you are authenticated']);
     });
     // Add other routes that need protection
 });
