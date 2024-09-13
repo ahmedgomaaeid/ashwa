@@ -26,6 +26,7 @@ Route::group(['prefix' => 'auth'], function () {
 
 Route::group(['prefix' => 'public'], function () {
     Route::get('categories', [App\Http\Controllers\Api\CategoryController::class, 'index']);
+    Route::get('products/{id}', [App\Http\Controllers\Api\CategoryController::class, 'products']);
 });
 
 
