@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
+use Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
@@ -63,7 +64,7 @@ class AuthController extends Controller
     public function sendVerificationCode($user)
     {
         // Generate a 6-digit random verification code
-        $verificationCode = "00000";//rand(100000, 999999);
+        $verificationCode = "00000"; //rand(100000, 999999);
 
         // Save the verification code and its expiration time
         $user->update([
@@ -193,5 +194,115 @@ class AuthController extends Controller
         }
 
         return response()->json(['message' => 'Verification code sent successfully.']);
+    }
+
+
+    // Password reset
+    public function requestResetCode(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|string',
+        ]);
+
+        $user = User::where('phone', $request->phone)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
+        // Check if a code was already sent recently to prevent abuse
+        if ($user->reset_token_expires_at && now()->lessThan($user->reset_token_expires_at)) {
+            return response()->json(['message' => 'A reset code was already sent recently. Please wait before requesting again.'], 429);
+        }
+
+        $resetCode = "11111"; //rand(100000, 999999);
+
+        $user->update([
+            'verification_code' => $resetCode,
+            'verification_expires_at' => now()->addMinutes(10),
+        ]);
+
+        // // Send the reset code via SMS using your SMS provider's API
+        // $response = Http::post('https://sms-provider-api.com/send', [
+        //     'phone' => $user->phone,
+        //     'message' => "Your password reset code is: $resetCode",
+        // ]);
+
+        // if (!$response->successful()) {
+        //     return response()->json(['message' => 'Failed to send reset code.'], 500);
+        // }
+
+        return response()->json(['message' => 'Reset code sent successfully.']);
+    }
+
+
+    public function verifyResetCode(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|string',
+            'reset_code' => 'required|string', // Accept the 6-digit code from the user
+        ]);
+
+        $user = User::where('phone', $request->phone)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
+        // Check if the reset code matches and is not expired
+        if ($user->verification_code !== $request->reset_code || now()->greaterThan($user->verification_expires_at)) {
+            return response()->json(['message' => 'Invalid or expired reset code.'], 401);
+        }
+
+        // Generate a unique reset token using a combination of phone and reset code
+        $plainToken = $request->phone . $request->reset_code . "asdf123"; // Generate a unique token
+        $hashedToken = Hash::make($plainToken); // Hash the token to store securely
+
+        // Save the hashed version of the token and set an expiration time
+        $user->update([
+            'reset_token' => $hashedToken,
+            'reset_token_expires_at' => now()->addMinutes(10), // Set an expiration time for the token
+        ]);
+
+        // Return the plain (unhashed) token to the user
+        return response()->json(['message' => 'Code verified successfully.', 'reset_token' => $hashedToken]);
+    }
+
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|string',
+            'new_password' => 'required|string|min:8',
+            'reset_token' => 'required|string', // Require the verified reset token
+        ]);
+
+        $user = User::where('phone', $request->phone)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
+        // Ensure that the reset token is still valid
+        if (now()->greaterThan($user->reset_token_expires_at)) {
+            return response()->json(['message' => 'Reset token has expired. Please request a new reset.'], 401);
+        }
+
+        // Verify the reset token to ensure it matches
+        if ($request->reset_token != $user->reset_token) {
+            return response()->json(['message' => 'Invalid reset token.'], 401);
+        }
+
+        // Hash the new password before saving it
+        $newPassword = Hash::make($request->new_password);
+
+        // Reset the user's password and clear the reset token
+        $user->update([
+            'password' => $newPassword,
+            'reset_token' => null, // Clear the reset token after use
+            'reset_token_expires_at' => null, // Clear the expiration time
+        ]);
+
+        return response()->json(['message' => 'Password reset successfully.']);
     }
 }

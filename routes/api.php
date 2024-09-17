@@ -23,6 +23,9 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('phonelogin', [App\Http\Controllers\Api\AuthController::class, 'phoneLogin']);
     Route::post('verify-code', [App\Http\Controllers\Api\AuthController::class, 'verifyCode']);
     Route::post('send-again',[App\Http\Controllers\Api\AuthController::class, 'sendAgain']);
+    Route::post('password/reset-request', [App\Http\Controllers\Api\AuthController::class, 'requestResetCode']);
+    Route::post('password/verify-reset-code', [App\Http\Controllers\Api\AuthController::class, 'verifyResetCode']);
+    Route::post('password/reset', [App\Http\Controllers\Api\AuthController::class, 'resetPassword']);
 });
 
 Route::group(['prefix' => 'public'], function () {
