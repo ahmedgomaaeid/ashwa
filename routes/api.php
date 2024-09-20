@@ -40,5 +40,10 @@ Route::middleware(['jwt.verify', 'check.verified'])->group(function () {
     Route::get('/test', function () {
         return response()->json(['message' => 'Now you are authenticated']);
     });
-    // Add other routes that need protection
+    
+    Route::group(['prefix'=>'profile'], function(){
+        Route::get('me', [App\Http\Controllers\Api\ProfileController::class, 'me']);
+        Route::post('update', [App\Http\Controllers\Api\ProfileController::class, 'update']);
+        Route::post('update-password', [App\Http\Controllers\Api\ProfileController::class, 'updatePassword']);
+    });
 });
