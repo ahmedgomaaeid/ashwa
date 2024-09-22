@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Offer;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -19,7 +20,7 @@ class CategoryController extends Controller
         $category = Category::find($id);
         // get all products of this category with their images
         $products = $category->products()->with('images')->get();
-        
+
         return response()->json([
             'category_name' => $category->name,
             'products' => $products
@@ -34,5 +35,15 @@ class CategoryController extends Controller
             ->with('images')
             ->get();
         return response()->json($products);
+    }
+    public function product_detail($id, $product_id)
+    {
+        $product = Product::where('category_id', $id)->where('id', $product_id)->with('images')->first();
+        return response()->json($product);
+    }
+    public function offers()
+    {
+        $offers = Offer::all();
+        return response()->json($offers);
     }
 }

@@ -29,16 +29,20 @@ Route::group(['prefix' => 'auth'], function () {
 });
 
 Route::group(['prefix' => 'public'], function () {
+    Route::get('offers', [App\Http\Controllers\Api\CategoryController::class, 'offers']);
     Route::get('categories', [App\Http\Controllers\Api\CategoryController::class, 'index']);
     Route::get('category/{id}/products', [App\Http\Controllers\Api\CategoryController::class, 'products']);
+    Route::get('category/{id}/product/{product_id}',[App\Http\Controllers\Api\CategoryController::class, 'product_detail']);
     Route::get('search', [App\Http\Controllers\Api\CategoryController::class, 'search']);
 });
 
 
-Route::middleware(['jwt.verify', 'check.verified'])->group(function () {
+Route::middleware(['jwt.verify'])->group(function () {
     // Protected routes
-    Route::get('/test', function () {
-        return response()->json(['message' => 'Now you are authenticated']);
+    Route::middleware(['check.verified'])->group(function () {
+        Route::get('/test', function () {
+            return response()->json(['message' => 'Now you are authenticated']);
+        });
     });
     
     Route::group(['prefix'=>'profile'], function(){
