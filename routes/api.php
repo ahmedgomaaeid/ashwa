@@ -31,10 +31,13 @@ Route::group(['prefix' => 'auth'], function () {
 Route::group(['prefix' => 'public'], function () {
     Route::get('offers', [App\Http\Controllers\Api\CategoryController::class, 'offers']);
     Route::get('categories', [App\Http\Controllers\Api\CategoryController::class, 'index']);
-    Route::get('category/{id}/products', [App\Http\Controllers\Api\CategoryController::class, 'products']);
-    Route::get('category/{id}/product/{product_id}',[App\Http\Controllers\Api\CategoryController::class, 'product_detail']);
+    Route::get('category/{id}/sections', [App\Http\Controllers\Api\CategoryController::class, 'sections']);
+    Route::get('category/{id}/section/{s_id}/products', [App\Http\Controllers\Api\CategoryController::class, 'products']);
+    Route::get('category/{id}/section/{s_id}/product/{product_id}',[App\Http\Controllers\Api\CategoryController::class, 'product_detail']);
     Route::get('search', [App\Http\Controllers\Api\CategoryController::class, 'search']);
 });
+
+
 
 
 Route::middleware(['jwt.verify'])->group(function () {
@@ -44,7 +47,7 @@ Route::middleware(['jwt.verify'])->group(function () {
             return response()->json(['message' => 'Now you are authenticated']);
         });
     });
-    
+
     Route::group(['prefix'=>'profile'], function(){
         Route::get('me', [App\Http\Controllers\Api\ProfileController::class, 'me']);
         Route::post('update', [App\Http\Controllers\Api\ProfileController::class, 'update']);

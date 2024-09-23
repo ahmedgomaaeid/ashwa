@@ -15,17 +15,23 @@ class CategoryController extends Controller
         $categories = Category::all();
         return response()->json($categories);
     }
-    public function products($id)
+
+    public function sections($id)
     {
         $category = Category::find($id);
-        // get all products of this category with their images
-        $products = $category->products()->with('images')->get();
-
+        $sections = $category->sections;
         return response()->json([
             'category_name' => $category->name,
-            'products' => $products
+            'sections' => $sections
         ]);
     }
+
+    public function products($id, $s_id)
+    {
+        $products = Product::where('category_id', $id)->where('section_id', $s_id)->with('images')->get();
+        return response()->json($products);
+    }
+
     public function search(Request $request)
     {
         $search = $request->search;
@@ -36,9 +42,9 @@ class CategoryController extends Controller
             ->get();
         return response()->json($products);
     }
-    public function product_detail($id, $product_id)
+    public function product_detail($id, $s_id, $product_id)
     {
-        $product = Product::where('category_id', $id)->where('id', $product_id)->with('images')->first();
+        $product = Product::find($product_id)->load('images');
         return response()->json($product);
     }
     public function offers()
