@@ -26,9 +26,9 @@ class CategoryController extends Controller
         ]);
     }
 
-    public function products($id, $s_id)
+    public function products($s_id)
     {
-        $products = Product::where('category_id', $id)->where('section_id', $s_id)->with('images')->get();
+        $products = Product::where('section_id', $s_id)->with('images')->get();
         return response()->json($products);
     }
 
@@ -42,7 +42,7 @@ class CategoryController extends Controller
             ->get();
         return response()->json($products);
     }
-    public function product_detail($id, $s_id, $product_id)
+    public function product_detail($product_id)
     {
         $product = Product::find($product_id)->load('images');
         return response()->json($product);

@@ -32,8 +32,8 @@ Route::group(['prefix' => 'public'], function () {
     Route::get('offers', [App\Http\Controllers\Api\CategoryController::class, 'offers']);
     Route::get('categories', [App\Http\Controllers\Api\CategoryController::class, 'index']);
     Route::get('category/{id}/sections', [App\Http\Controllers\Api\CategoryController::class, 'sections']);
-    Route::get('category/{id}/section/{s_id}/products', [App\Http\Controllers\Api\CategoryController::class, 'products']);
-    Route::get('category/{id}/section/{s_id}/product/{product_id}',[App\Http\Controllers\Api\CategoryController::class, 'product_detail']);
+    Route::get('section/{s_id}/products', [App\Http\Controllers\Api\CategoryController::class, 'products']);
+    Route::get('product/{product_id}',[App\Http\Controllers\Api\CategoryController::class, 'product_detail']);
     Route::get('search', [App\Http\Controllers\Api\CategoryController::class, 'search']);
 });
 
@@ -52,5 +52,11 @@ Route::middleware(['jwt.verify'])->group(function () {
         Route::get('me', [App\Http\Controllers\Api\ProfileController::class, 'me']);
         Route::post('update', [App\Http\Controllers\Api\ProfileController::class, 'update']);
         Route::post('update-password', [App\Http\Controllers\Api\ProfileController::class, 'updatePassword']);
+    });
+
+    Route::group(['prefix'=>'wishlist'], function(){
+        Route::get('get', [App\Http\Controllers\Api\WishlistController::class, 'get']);
+        Route::post('add', [App\Http\Controllers\Api\WishlistController::class, 'add']);
+        Route::post('remove', [App\Http\Controllers\Api\WishlistController::class, 'remove']);
     });
 });
