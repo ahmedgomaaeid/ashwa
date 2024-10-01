@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class ProfileController extends Controller
 {
@@ -29,5 +31,45 @@ class ProfileController extends Controller
         }
         $user->update(['password' => Hash::make($request->password)]);
         return response()->json(['message' => 'Password updated successfully']);
+    }
+
+    //change profile image
+    public function updateImage(Request $request)
+    {
+        $user = $request->user();
+
+        // Validate the request to ensure it has an image file
+        $validator = Validator::make($request->all(), [
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Handle the image upload
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+
+            // Store the image in a public storage folder
+            $path = $image->storeAs('profile_images', $imageName, 'public');
+
+            // Delete the old image if it exists
+            if ($user->image) {
+                Storage::disk('public')->delete($user->image);
+            }
+
+            // Update the user's image path
+            $user->image = $path;
+            $user->save();
+
+            return response()->json([
+                'message' => 'Image updated successfully',
+                'image_url' => asset('storage/' . $user->image),
+            ]);
+        }
+
+        return response()->json(['message' => 'No image uploaded'], 400);
     }
 }

@@ -16,3 +16,14 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::group(['prefix' => 'admin', 'middleware'=> [''], 'as'=> 'amdin', 'namespace'=> 'Admin'], function () {
+    Route::group(['prefix' => 'category'], function () {
+        Route::get('/', 'CategoryController@index')->name('category.index');
+        Route::get('/create', 'CategoryController@create')->name('category.create');
+        Route::post('/store', 'CategoryController@store')->name('category.store');
+        Route::get('/edit/{id}', 'CategoryController@edit')->name('category.edit');
+        Route::post('/update/{id}', 'CategoryController@update')->name('category.update');
+        Route::get('/delete/{id}', 'CategoryController@delete')->name('category.delete');
+    });
+});

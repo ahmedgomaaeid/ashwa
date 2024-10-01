@@ -52,11 +52,18 @@ Route::middleware(['jwt.verify'])->group(function () {
         Route::get('me', [App\Http\Controllers\Api\ProfileController::class, 'me']);
         Route::post('update', [App\Http\Controllers\Api\ProfileController::class, 'update']);
         Route::post('update-password', [App\Http\Controllers\Api\ProfileController::class, 'updatePassword']);
+        Route::post('update-image', [App\Http\Controllers\Api\ProfileController::class, 'updateImage']);
     });
 
     Route::group(['prefix'=>'wishlist'], function(){
         Route::get('get', [App\Http\Controllers\Api\WishlistController::class, 'get']);
         Route::post('add', [App\Http\Controllers\Api\WishlistController::class, 'add']);
         Route::post('remove', [App\Http\Controllers\Api\WishlistController::class, 'remove']);
+    });
+
+    Route::group(['prefix'=>'cart'], function(){
+        Route::get('get', [App\Http\Controllers\Api\CartController::class, 'get']);
+        Route::post('add', [App\Http\Controllers\Api\CartController::class, 'add']);
+        Route::post('remove', [App\Http\Controllers\Api\CartController::class, 'remove']);
     });
 });
