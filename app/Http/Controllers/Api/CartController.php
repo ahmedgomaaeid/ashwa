@@ -14,14 +14,14 @@ class CartController extends Controller
         $total += $delery;
         $user = auth()->user();
         $carts = $user->carts->load('product')->map(function ($cart) use (&$total) {
-            $total += $cart->price * $cart->quantity;
+            $total += 30 * $cart->quantity;
             return [
                 'id' => $cart->id,
                 'product_id' => $cart->product_id,
                 'name' => $cart->product->name,
                 'image' => $cart->product->images->first(),
-                'price' => $cart->price,
-                'quantity' => $cart->quantity
+                'quantity' => $cart->quantity,
+                'unit_price' => 30
             ];
         });
         return response()->json(['cart_items' => $carts, 'delevery' => $delery, 'total' => $total]);
@@ -42,8 +42,7 @@ class CartController extends Controller
         } else {
             $cart = $user->carts()->create([
                 'product_id' => $request->product_id,
-                'quantity' => $request->quantity,
-                'price' => $request->price
+                'quantity' => $request->quantity
             ]);
         }
 
