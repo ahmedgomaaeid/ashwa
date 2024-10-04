@@ -9,11 +9,16 @@ class CartController extends Controller
 {
     public function get()
     {
+        $user = auth()->user();
         $total = 0;
         $delery = 20;
+        $cart_data = $user->carts->load('product');
+        if($cart_data->count() == 0){
+            return response()->json(['cart_items' => [], 'delevery' => 0, 'total' => 0]);
+        }
         $total += $delery;
-        $user = auth()->user();
-        $carts = $user->carts->load('product')->map(function ($cart) use (&$total) {
+
+        $carts = $cart_data->map(function ($cart) use (&$total) {
             $total += 30 * $cart->quantity;
             return [
                 'id' => $cart->id,
