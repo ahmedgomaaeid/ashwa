@@ -35,6 +35,9 @@ class CategoryController extends Controller
     public function search(Request $request)
     {
         $search = $request->search;
+        if ($search == '' || $search == " ") {
+            return response()->json([]);
+        }
         //search in products name and description but name appears first
         $products = Product::where('name', 'like', "%$search%")
             ->orWhere('description', 'like', "%$search%")
@@ -51,5 +54,24 @@ class CategoryController extends Controller
     {
         $offers = Offer::all();
         return response()->json($offers);
+    }
+
+    public function homepage(Request $request)
+    {
+        $num_of_categories = $request->num_of_categories ?? 1;
+        $num_of_category_products = $request->num_of_category_products ?? 1;
+
+        $categories = Category::get();
+        $categories = $categories->map(function ($category) use ($num_of_category_products) {
+            $category->products = $category->products()
+                ->with('firstImage')
+                ->inRandomOrder()
+                ->take($num_of_category_products)
+                ->get();
+            return $category;
+        })->take($num_of_categories);
+
+        return response()->json($categories);
+
     }
 }
