@@ -41,7 +41,7 @@ class OfferResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('id')->sortable(),
-                ImageColumn::make('image')->label('Category Image'),
+                ImageColumn::make('image')->label('Offer Image'),
                 TextColumn::make('created_at')->dateTime()->sortable(),
             ])
             ->filters([

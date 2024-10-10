@@ -53,7 +53,7 @@ class SectionResource extends Resource
             ->columns([
                 TextColumn::make('id')->sortable(),
                 TextColumn::make('name')->sortable()->searchable(),
-                ImageColumn::make('image')->label('Category Image'),
+                ImageColumn::make('image')->label('Section Image'),
 
                 TextColumn::make('category.name')
                     ->label('Category')
