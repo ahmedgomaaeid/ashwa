@@ -28,7 +28,7 @@ class CategoryController extends Controller
 
     public function products($s_id)
     {
-        $products = Product::where('section_id', $s_id)->with('images')->get();
+        $products = Product::where('status', 1)->where('section_id', $s_id)->with('images')->get();
         return response()->json($products);
     }
 
@@ -39,7 +39,7 @@ class CategoryController extends Controller
             return response()->json([]);
         }
         //search in products name and description but name appears first
-        $products = Product::where('name', 'like', "%$search%")
+        $products = Product::where('status', 1)->where('name', 'like', "%$search%")
             ->orWhere('description', 'like', "%$search%")
             ->with('images')
             ->get();
@@ -47,7 +47,7 @@ class CategoryController extends Controller
     }
     public function product_detail($product_id)
     {
-        $product = Product::find($product_id)->load('images');
+        $product = Product::where('status', 1)->find($product_id)->load('images');
         return response()->json($product);
     }
     public function offers()
@@ -72,6 +72,5 @@ class CategoryController extends Controller
         })->take($num_of_categories);
 
         return response()->json($categories);
-
     }
 }

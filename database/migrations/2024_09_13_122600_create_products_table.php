@@ -22,6 +22,7 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->decimal('delivery_fees', 10, 2);
             $table->integer('quantity')->default(1);
+            $table->tinyInteger('status')->default(1);
             $table->timestamps();
         });
     }

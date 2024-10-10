@@ -66,7 +66,7 @@ class ProfileController extends Controller
 
             return response()->json([
                 'message' => 'Image updated successfully',
-                'image_url' => asset('storage/' . $user->image),
+                'image_url' => $user->image,
             ]);
         }
 
