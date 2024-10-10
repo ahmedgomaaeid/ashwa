@@ -24,7 +24,7 @@ class CategoryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';  // Add this line to define the icon
     protected static ?string $navigationLabel = 'Categories';  // Add this line to define the label
-    protected static ?int $navigationSort = 2;  // Optional: Set the order in the navigation menu
+    protected static ?int $navigationSort = 3;  // Optional: Set the order in the navigation menu
 
 
     public static function form(Form $form): Form

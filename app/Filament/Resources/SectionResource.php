@@ -26,7 +26,7 @@ class SectionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {
@@ -54,7 +54,7 @@ class SectionResource extends Resource
                 TextColumn::make('id')->sortable(),
                 TextColumn::make('name')->sortable()->searchable(),
                 ImageColumn::make('image')->label('Category Image'),
-                
+
                 TextColumn::make('category.name')
                     ->label('Category')
                     ->sortable(),
