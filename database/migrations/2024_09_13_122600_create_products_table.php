@@ -18,9 +18,10 @@ return new class extends Migration
             // foreign key to category
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->foreignId('section_id')->constrained()->onDelete('cascade');
-            $table->float('price');
+            // make price and delivery fees just 2 decimal points
+            $table->decimal('price', 10, 2);
+            $table->decimal('delivery_fees', 10, 2);
             $table->integer('quantity')->default(1);
-            $table->float('delivery_fees')->default(0);
             $table->timestamps();
         });
     }

@@ -19,9 +19,10 @@ class ProductFactory extends Factory
         return [
             'name' => $this->faker->name,
             'description' => $this->faker->sentence,
-            'price' => $this->faker->randomFloat(2, 1, 1000),
-            'quantity' => $this->faker->randomNumber(2),
+            // make price and delivery fees just 2 decimal points
+            'price' => $this->faker->randomFloat(2, 0, 1000),
             'delivery_fees' => $this->faker->randomFloat(2, 0, 100),
+            'quantity' => $this->faker->randomNumber(2),
             'category_id' => \App\Models\Category::factory(),
         ];
     }
