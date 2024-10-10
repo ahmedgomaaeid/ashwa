@@ -58,7 +58,10 @@ class CartController extends Controller
         ]);
 
         $user = auth()->user();
-
+        if(!$user)
+        {
+            return response()->json(['message' => 'User not found']);
+        }
         // Use 'updateOrCreate' for cleaner logic
         $cart = $user->carts()->updateOrCreate(
             ['product_id' => $validated['product_id']],
