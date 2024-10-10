@@ -27,3 +27,8 @@ Route::group(['prefix' => 'admin', 'middleware'=> [''], 'as'=> 'amdin', 'namespa
         Route::get('/delete/{id}', 'CategoryController@delete')->name('category.delete');
     });
 });
+// Route::middleware(['auth:admin', 'admin'])->group(function () {
+//     Route::get('/admin/dashboard', function () {
+//         return view('admin.dashboard');
+//     });
+// });

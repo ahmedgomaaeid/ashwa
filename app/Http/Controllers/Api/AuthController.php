@@ -22,6 +22,7 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'phone' => 'required|string|max:15|unique:users',
             'password' => 'required|string|min:8',
+            'type' => 'required|in:0,1',
         ]);
 
         // Check if validation fails

@@ -41,7 +41,7 @@ Route::group(['prefix' => 'public'], function () {
 
 
 
-Route::middleware(['jwt.verify'])->group(function () {
+Route::middleware(['jwt.verify', 'check.verified'])->group(function () {
     // Protected routes
     Route::middleware(['check.verified'])->group(function () {
         Route::get('/test', function () {

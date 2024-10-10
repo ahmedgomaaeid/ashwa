@@ -18,6 +18,9 @@ return new class extends Migration
             // foreign key to category
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->foreignId('section_id')->constrained()->onDelete('cascade');
+            $table->float('price');
+            $table->integer('quantity')->default(1);
+            $table->float('delivery_fees')->default(0);
             $table->timestamps();
         });
     }

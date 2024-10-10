@@ -10,60 +10,74 @@ class CartController extends Controller
     public function get()
     {
         $user = auth()->user();
-        $total = 0;
-        $delery = 20;
-        $cart_data = $user->carts->load('product');
-        if($cart_data->count() == 0){
-            return response()->json(['cart_items' => [], 'delevery' => 0, 'total' => 0]);
-        }
-        $total += $delery;
 
-        $carts = $cart_data->map(function ($cart) use (&$total) {
-            $total += 30 * $cart->quantity;
+        // Eager load 'product' and 'product.images' to prevent N+1 query problem
+        $cartItems = $user->carts()->with('product.images')->get();
+
+        if ($cartItems->isEmpty()) {
+            return response()->json(['cart_items' => [], 'delivery' => 0, 'total' => 0]);
+        }
+
+        $total = 0;
+        $delivery = 0;
+
+        // Use collection methods for cleaner code
+        $cartData = $cartItems->map(function ($cart) use (&$total, &$delivery) {
+            $product = $cart->product;
+            $quantity = $cart->quantity;
+            $unitPrice = $product->price;
+            $productDeliveryFee = $product->delivery_fees;
+
+            $total += $unitPrice * $quantity;
+            $delivery += $productDeliveryFee;
+
             return [
-                'id' => $cart->id,
-                'product_id' => $cart->product_id,
-                'name' => $cart->product->name,
-                'image' => $cart->product->images->first(),
-                'quantity' => $cart->quantity,
-                'unit_price' => 30
+                'id'          => $cart->id,
+                'product_id'  => $product->id,
+                'name'        => $product->name,
+                'image'       => $product->images->first(),
+                'quantity'    => $quantity,
+                'unit_price'  => $unitPrice,
             ];
         });
-        return response()->json(['cart_items' => $carts, 'delevery' => $delery, 'total' => $total]);
+
+        $total += $delivery;
+
+        return response()->json([
+            'cart_items' => $cartData,
+            'delivery'   => $delivery,
+            'total'      => $total,
+        ]);
     }
 
     public function add(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1'
+            'quantity'   => 'required|integer|min:1',
         ]);
 
         $user = auth()->user();
-        $cart = $user->carts()->where('product_id', $request->product_id)->first();
-        if ($cart) {
-            $cart->quantity = $request->quantity;
-            $cart->save();
-        } else {
-            $cart = $user->carts()->create([
-                'product_id' => $request->product_id,
-                'quantity' => $request->quantity
-            ]);
-        }
+
+        // Use 'updateOrCreate' for cleaner logic
+        $cart = $user->carts()->updateOrCreate(
+            ['product_id' => $validated['product_id']],
+            ['quantity'   => $validated['quantity']]
+        );
 
         return response()->json(['cart' => $cart]);
     }
+
     public function remove(Request $request)
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id'
+        $validated = $request->validate([
+            'product_id' => 'required|exists:products,id',
         ]);
 
         $user = auth()->user();
-        $cart = $user->carts()->where('product_id', $request->product_id)->first();
-        if ($cart) {
-            $cart->delete();
-        }
+
+        // Use 'delete' directly on the query
+        $user->carts()->where('product_id', $validated['product_id'])->delete();
 
         return response()->json(['message' => 'Item removed from cart']);
     }
