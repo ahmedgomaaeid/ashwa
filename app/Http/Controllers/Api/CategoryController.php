@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Offer;
 use App\Models\Product;
+use App\Models\Wishlist;
+use Exception;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class CategoryController extends Controller
 {
@@ -45,9 +48,34 @@ class CategoryController extends Controller
             ->get();
         return response()->json($products);
     }
-    public function product_detail($product_id)
+    public function product_detail(Request $request, $product_id)
     {
-        $product = Product::where('status', 1)->find($product_id)->load('images');
+        // check if bearer token is sent in header and user is authenticated
+        // if ($request->bearerToken() == null ) {
+        //     $product = Product::where('status', 1)->find($product_id)->load('images');
+        // } else {
+        //     // check if product is in user's wishlist
+        //     $product = Product::where('status', 1)->find($product_id)->load('images');
+        //     Wishlist::where('user_id', $request->user()->id)->where('product_id', $product_id)->exists() ? $product->is_wishlist = true : $product->is_wishlist = false;
+
+        // }
+        if($request->bearerToken() != null)
+        {
+            // check middle ware jwt.verify
+            try{
+                $user = JWTAuth::parseToken()->authenticate();
+            }catch(Exception $e){
+                return response()->json(['message' => 'Token not found'], 401);
+            }
+
+            $user = JWTAuth::parseToken()->authenticate();
+            $product = Product::where('status', 1)->find($product_id)->load('images');
+            Wishlist::where('user_id', $user->id)->where('product_id', $product_id)->exists() ? $product->is_wishlist = true : $product->is_wishlist = false;
+        }else
+        {
+            $product = Product::where('status', 1)->find($product_id)->load('images');
+        }
+
         return response()->json($product);
     }
     public function offers()

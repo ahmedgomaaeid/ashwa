@@ -33,7 +33,7 @@ Route::group(['prefix' => 'public'], function () {
     Route::get('categories', [App\Http\Controllers\Api\CategoryController::class, 'index']);
     Route::get('category/{id}/sections', [App\Http\Controllers\Api\CategoryController::class, 'sections']);
     Route::get('section/{s_id}/products', [App\Http\Controllers\Api\CategoryController::class, 'products']);
-    Route::get('product/{product_id}',[App\Http\Controllers\Api\CategoryController::class, 'product_detail']);
+    Route::post('product/{product_id}',[App\Http\Controllers\Api\CategoryController::class, 'product_detail']);
     Route::post('search', [App\Http\Controllers\Api\CategoryController::class, 'search']);
     Route::post('homepage', [App\Http\Controllers\Api\CategoryController::class, 'homepage']);
 });
