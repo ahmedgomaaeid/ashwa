@@ -64,13 +64,11 @@ class CategoryController extends Controller
             // check middle ware jwt.verify
             try{
                 $user = JWTAuth::parseToken()->authenticate();
-            }catch(Exception $e){
-                return response()->json(['message' => 'Token not found'], 401);
-            }
-
-            $user = JWTAuth::parseToken()->authenticate();
-            $product = Product::where('status', 1)->find($product_id)->load('images');
+                $product = Product::where('status', 1)->find($product_id)->load('images');
             Wishlist::where('user_id', $user->id)->where('product_id', $product_id)->exists() ? $product->is_wishlist = true : $product->is_wishlist = false;
+            }catch(Exception $e){
+                $product = Product::where('status', 1)->find($product_id)->load('images');
+            }
         }else
         {
             $product = Product::where('status', 1)->find($product_id)->load('images');
