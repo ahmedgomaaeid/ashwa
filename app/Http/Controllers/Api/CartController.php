@@ -54,7 +54,6 @@ class CartController extends Controller
     {
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
-            'quantity'   => 'required|integer|min:1',
         ]);
 
         $user = auth()->user();
@@ -62,13 +61,45 @@ class CartController extends Controller
         {
             return response()->json(['message' => 'User not found']);
         }
-        // Use 'updateOrCreate' for cleaner logic
-        $cart = $user->carts()->updateOrCreate(
-            ['product_id' => $validated['product_id']],
-            ['quantity'   => $validated['quantity']]
-        );
+        // Check if the product is already in the cart
+        $cart = $user->carts()->where('product_id', $validated['product_id'])->first();
+        if($cart)
+        {
+            $cart->quantity += 1;
+            $cart->save();
+        }
+        else
+        {
+            $user->carts()->create($validated);
+        }
 
-        return response()->json(['cart' => $cart]);
+    return response()->json(['message' => 'Item added to cart']);
+    }
+
+    public function subtract(Request $request)
+    {
+        $validated = $request->validate([
+            'product_id' => 'required|exists:products,id',
+        ]);
+
+        $user = auth()->user();
+
+        $cart = $user->carts()->where('product_id', $validated['product_id'])->first();
+        if(!$cart)
+        {
+            return response()->json(['message' => 'Item not found in cart']);
+        }
+        if($cart->quantity > 1)
+        {
+            $cart->quantity -= 1;
+            $cart->save();
+        }
+        else
+        {
+            $cart->delete();
+        }
+
+        return response()->json(['message' => 'Item quantity subtracted']);
     }
 
     public function remove(Request $request)

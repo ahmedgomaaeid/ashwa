@@ -65,6 +65,7 @@ Route::middleware(['jwt.verify'])->group(function () {
     Route::group(['prefix'=>'cart'], function(){
         Route::get('get', [App\Http\Controllers\Api\CartController::class, 'get']);
         Route::post('add', [App\Http\Controllers\Api\CartController::class, 'add']);
+        Route::post('subtract', [App\Http\Controllers\Api\CartController::class, 'subtract']);
         Route::post('remove', [App\Http\Controllers\Api\CartController::class, 'remove']);
     });
 });
