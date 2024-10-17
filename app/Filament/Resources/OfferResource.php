@@ -20,7 +20,8 @@ class OfferResource extends Resource
 {
     protected static ?string $model = Offer::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    // icon as photo
+    protected static ?string $navigationIcon = 'heroicon-o-photo';
 
     protected static ?int $navigationSort = 2;  // Optional: Set the order in the navigation menu
 

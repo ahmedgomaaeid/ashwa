@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Livewire::component(
+            'filament.resources.product-resource.relation-managers.images-relation-manager',
+            \App\Filament\Resources\ProductResource\RelationManagers\ImagesRelationManager::class
+        );
     }
 }
