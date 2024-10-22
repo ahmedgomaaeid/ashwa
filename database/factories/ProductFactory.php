@@ -19,6 +19,7 @@ class ProductFactory extends Factory
         return [
             'name' => $this->faker->name,
             'description' => $this->faker->sentence,
+            'user_id' => 2,
             // make price and delivery fees just 2 decimal points
             'price' => $this->faker->randomFloat(2, 0, 1000),
             'delivery_fees' => $this->faker->randomFloat(2, 0, 100),

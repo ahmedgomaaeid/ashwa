@@ -8,6 +8,7 @@ use App\Filament\Resources\ProductResource\RelationManagers\ImagesRelationManage
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Section;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\BelongsToSelect;
 use Filament\Forms\Components\Select;
@@ -39,6 +40,14 @@ class ProductResource extends Resource
                 Forms\Components\Textarea::make('description')
                     ->required()
                     ->maxLength(65535),
+
+                // seller
+                Select::make('user_id')
+                    ->label('Seller')
+                    ->options(function () {
+                        return User::where('type', 1)->pluck('name', 'id');
+                    })
+                    ->required(),
 
                 // Price
                 Forms\Components\TextInput::make('price')
@@ -105,6 +114,11 @@ class ProductResource extends Resource
                     ->searchable()
                     ->sortable(),
 
+                // Seller name
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('Seller')
+                    ->sortable(),
+
                 // Price
                 Tables\Columns\TextColumn::make('price')
                     ->sortable(),
@@ -137,7 +151,7 @@ class ProductResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ])->defaultSort('id', 'desc');
     }
 
     // Register relation managers

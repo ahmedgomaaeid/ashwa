@@ -19,4 +19,14 @@ class Category extends Model
     {
         return $this->hasMany(Section::class);
     }
+
+    public function getImageAttribute($value)
+    {
+        if (!str_starts_with($value, 'http')) {
+            return asset('storage/' . $value);
+        }else
+        {
+            return $value;
+        }
+    }
 }

@@ -49,6 +49,10 @@ class User extends Authenticatable implements JWTSubject , FilamentUser
         return $value ? asset('storage/' . $value) : asset('img/default-user.png');
     }
 
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
 
 }
 

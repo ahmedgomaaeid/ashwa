@@ -69,7 +69,7 @@ class ProductImageResource extends Resource
             ->bulkActions([
                 // Bulk delete action
                 Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ])->defaultSort('id', 'desc');
     }
 
     public static function getPages(): array

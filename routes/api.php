@@ -44,8 +44,18 @@ Route::group(['prefix' => 'public'], function () {
 Route::middleware(['jwt.verify'])->group(function () {
     // Protected routes
     Route::middleware(['check.verified'])->group(function () {
-        Route::get('/test', function () {
-            return response()->json(['message' => 'Now you are authenticated']);
+        Route::group(['prefix' => 'seller'], function () {
+            Route::group(['prefix' => 'product' , 'middleware' => 'sellerCheck'], function () {
+                Route::get('get-my-products', [App\Http\Controllers\Api\Seller\ProductController::class, 'get']);
+                Route::get('product/{product_id}', [App\Http\Controllers\Api\Seller\ProductController::class, 'getProduct']);
+                Route::get('categories', [App\Http\Controllers\Api\Seller\ProductController::class, 'getCategories']);
+                Route::get('cayegory/{category_id}/sections', [App\Http\Controllers\Api\Seller\ProductController::class, 'getSections']);
+                Route::post('add', [App\Http\Controllers\Api\Seller\ProductController::class, 'add']);
+                Route::post('update', [App\Http\Controllers\Api\Seller\ProductController::class, 'update']);
+                Route::post('delete', [App\Http\Controllers\Api\Seller\ProductController::class, 'delete']);
+                Route::post('upload-images', [App\Http\Controllers\Api\Seller\ProductController::class, 'uploadImages']);
+                Route::post('delete-image', [App\Http\Controllers\Api\Seller\ProductController::class, 'deleteImage']);
+            });
         });
     });
 
