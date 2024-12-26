@@ -44,8 +44,8 @@ Route::group(['prefix' => 'public'], function () {
 Route::middleware(['jwt.verify'])->group(function () {
     // Protected routes
     Route::middleware(['check.verified'])->group(function () {
-        Route::group(['prefix' => 'seller'], function () {
-            Route::group(['prefix' => 'product' , 'middleware' => 'sellerCheck'], function () {
+        Route::group(['prefix' => 'seller', 'middleware' => 'sellerCheck'], function () {
+            Route::group(['prefix' => 'product'], function () {
                 Route::get('get-my-products', [App\Http\Controllers\Api\Seller\ProductController::class, 'get']);
                 Route::get('product/{product_id}', [App\Http\Controllers\Api\Seller\ProductController::class, 'getProduct']);
                 Route::get('categories', [App\Http\Controllers\Api\Seller\ProductController::class, 'getCategories']);
@@ -55,6 +55,14 @@ Route::middleware(['jwt.verify'])->group(function () {
                 Route::post('delete', [App\Http\Controllers\Api\Seller\ProductController::class, 'delete']);
                 Route::post('upload-images', [App\Http\Controllers\Api\Seller\ProductController::class, 'uploadImages']);
                 Route::post('delete-image', [App\Http\Controllers\Api\Seller\ProductController::class, 'deleteImage']);
+            });
+
+            Route::group(['prefix' => 'order'], function () {
+                Route::get('get', [App\Http\Controllers\Api\Seller\OrderController::class, 'get']);
+                Route::get('order/{order_id}', [App\Http\Controllers\Api\Seller\OrderController::class, 'getOrder']);
+                Route::post('status-shipped', [App\Http\Controllers\Api\Seller\OrderController::class, 'statusShipped']);
+                Route::post('status-delivered', [App\Http\Controllers\Api\Seller\OrderController::class, 'statusDelivered']);
+                Route::post('status-canceled', [App\Http\Controllers\Api\Seller\OrderController::class, 'statusCanceled']);
             });
         });
     });
@@ -78,4 +86,13 @@ Route::middleware(['jwt.verify'])->group(function () {
         Route::post('subtract', [App\Http\Controllers\Api\CartController::class, 'subtract']);
         Route::post('remove', [App\Http\Controllers\Api\CartController::class, 'remove']);
     });
+
+    Route::group(['prefix'=>'order'], function(){
+        Route::post('place-order', [App\Http\Controllers\Api\OrderController::class, 'placeOrder']);
+        Route::get('get', [App\Http\Controllers\Api\OrderController::class, 'get']);
+        Route::get('/{order_id}', [App\Http\Controllers\Api\OrderController::class, 'getOrder']);
+        Route::post('cancel', [App\Http\Controllers\Api\OrderController::class, 'cancel']);
+    });
 });
+
+Route::get('payment/success/{order_id}', [App\Http\Controllers\Api\OrderController::class, 'paymentSuccess'])->name('api.order.payment.success');
