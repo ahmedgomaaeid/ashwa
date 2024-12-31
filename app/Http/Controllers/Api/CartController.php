@@ -45,8 +45,8 @@ class CartController extends Controller
 
         return response()->json([
             'cart_items' => $cartData,
-            'delivery'   => $delivery,
-            'total'      => $total,
+            'delivery'   => number_format($delivery, 2),
+            'total'      => number_format($total, 2),
         ]);
     }
 
