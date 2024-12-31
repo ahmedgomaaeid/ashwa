@@ -7,10 +7,12 @@ use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\SellerComeOrder;
+use App\Models\SellerTransaction;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Services\Payment;
 use Illuminate\Http\Request;
+use Log;
 
 class OrderController extends Controller
 {
@@ -48,6 +50,7 @@ class OrderController extends Controller
             $order_product->quantity = $item->quantity;
             $order_product->price = $item->product->price;
             $order_product->delivery_fees = $item->product->delivery_fees;
+            $order_product->status = $status_value;
             $order_product->save();
 
             $sellerComeOrder = new SellerComeOrder();
@@ -59,6 +62,18 @@ class OrderController extends Controller
             $sellerComeOrder->payment_method = $request->payment_method;
             $sellerComeOrder->status = $status_value;
             $sellerComeOrder->save();
+            if($order->payment_method == 0) {
+                $transaction = new SellerTransaction();
+                $transaction->order_id = $order->id;
+                $transaction->user_id = $item->product->user_id;
+                $user_discount = User::find($user->id)->where('finished_after', '!=', null)->where('finished_after', '>', now())->first('discount');
+                $user_discount = $user_discount? $user_discount->discount : env('DEFAULT_DISCOUNT');
+                $product_price = ($item->product->price * $item->quantity) + $item->product->delivery_fees;
+                $transaction->amount = $product_price * $user_discount / 100;
+                $transaction->sign = "-";
+                $transaction->notes = "order pay when receive fees";
+                $transaction->save();
+            }
         }
 
         Cart::where('user_id', $user->id)->delete();
@@ -118,13 +133,49 @@ class OrderController extends Controller
         if(!$order) {
             return response()->json(['message' => 'Order not found'], 404);
         }
-        if($order->status != 1) {
+        if($order->status != 1 or $order->created_at->diffInMinutes(now()) > 10) {
             return response()->json(['message' => 'Order can not be cancelled'], 400);
         }
         $order->status = 4;
         $order->save();
+
+        $sellerComeOrders = SellerComeOrder::where('order_id', $order->id)->get();
+        $orderProducts = OrderProduct::where('order_id', $order->id)->get();
+
+        // create transaction for each seller
+        foreach($orderProducts as $orderProduct) {
+            $orderProduct->status = 4;
+            $orderProduct->save();
+            if($order->payment_method == "0") {
+                $sellerTransaction = new SellerTransaction();
+                $sellerTransaction->order_id = $orderProduct->id;
+                $user_discount = User::find($order->user_id)->where('finished_after', '!=', null)->where('finished_after', '>', now())->first('discount');
+                $user_discount = $user_discount? $user_discount->discount : env('DEFAULT_DISCOUNT');
+                $product_price = ($orderProduct->price*$orderProduct->quantity) + $orderProduct->delivery_fees;
+                $sellerTransaction->amount = $product_price * $user_discount / 100;
+                $sellerTransaction->user_id = $order->user_id;
+                $sellerTransaction->sign = '+';
+                $sellerTransaction->notes = 'Order cancelled';
+                $sellerTransaction->save();
+            }else
+            {
+                $sellerTransaction = new SellerTransaction();
+                $sellerTransaction->order_id = $orderProduct->id;
+                $user_discount = User::find($order->user_id)->where('finished_after', '!=', null)->where('finished_after', '>', now())->first('discount');
+                $user_discount = $user_discount? $user_discount->discount : env('DEFAULT_DISCOUNT');
+                $product_price = ($orderProduct->price*$orderProduct->quantity) + $orderProduct->delivery_fees;
+                $sellerTransaction->amount = $product_price - ($product_price * $user_discount / 100);
+                $sellerTransaction->user_id = $order->user_id;
+                $sellerTransaction->sign = '-';
+                $sellerTransaction->notes = 'Order cancelled';
+                $sellerTransaction->save();
+            }
+        }
+        foreach($sellerComeOrders as $sellerComeOrder) {
+            $sellerComeOrder->status = 4;
+            $sellerComeOrder->save();
+        }
         return response()->json(['message' => 'Order cancelled successfully'], 200);
     }
-
 
 }

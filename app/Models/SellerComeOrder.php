@@ -19,4 +19,8 @@ class SellerComeOrder extends Model
         'status',
     ];
 
+    public function orderProducts()
+    {
+        return $this->hasMany(OrderProduct::class, 'order_id', 'order_id');
+    }
 }

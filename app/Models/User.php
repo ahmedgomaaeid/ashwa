@@ -59,5 +59,10 @@ class User extends Authenticatable implements JWTSubject , FilamentUser
         return $this->hasMany(Order::class);
     }
 
+    public function sellerOrders()
+    {
+        return $this->hasMany(SellerComeOrder::class, 'seller_id');
+    }
+
 }
 

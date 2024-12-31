@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('quantity');
             $table->decimal('price', 10, 2);
             $table->decimal('delivery_fees', 10, 2);
+            $table->tinyInteger('status')->default(0)->comment('0: not paid, 1: pending, 2: shipped, 3: delivered, 4: canceled');
             $table->timestamps();
         });
     }

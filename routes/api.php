@@ -59,10 +59,11 @@ Route::middleware(['jwt.verify'])->group(function () {
 
             Route::group(['prefix' => 'order'], function () {
                 Route::get('get', [App\Http\Controllers\Api\Seller\OrderController::class, 'get']);
-                Route::get('order/{order_id}', [App\Http\Controllers\Api\Seller\OrderController::class, 'getOrder']);
-                Route::post('status-shipped', [App\Http\Controllers\Api\Seller\OrderController::class, 'statusShipped']);
-                Route::post('status-delivered', [App\Http\Controllers\Api\Seller\OrderController::class, 'statusDelivered']);
-                Route::post('status-canceled', [App\Http\Controllers\Api\Seller\OrderController::class, 'statusCanceled']);
+                Route::post('update-status', [App\Http\Controllers\Api\Seller\OrderController::class, 'updateOrderStatus']);
+            });
+
+            Route::group(['prefix' => 'transaction'], function () {
+                Route::get('get', [App\Http\Controllers\Api\Seller\TransactionController::class, 'get']);
             });
         });
     });

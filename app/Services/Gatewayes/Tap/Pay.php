@@ -2,7 +2,10 @@
 
 namespace App\Services\Gatewayes\Tap;
 
+use App\Models\OrderProduct;
 use App\Models\SellerComeOrder;
+use App\Models\SellerTransaction;
+use App\Models\User;
 
 class Pay
 {
@@ -56,7 +59,6 @@ class Pay
 
         $result = curl_exec($ch);
         $result = json_decode($result);
-        dd($result);
 
         if (!isset($result->status) or $result->status != "INITIATED") {
             return $result->message ?? 'Error';
@@ -89,7 +91,24 @@ class Pay
             $transaction->save();
             $order->status = 1;
             $order->save();
+
             $sellerComeOrders = SellerComeOrder::where('order_id', $order->id)->get();
+            $orderProducts = OrderProduct::where('order_id', $order->id)->get();
+            foreach ($orderProducts as $orderProduct) {
+                $orderProduct->status = 1;
+                $orderProduct->save();
+                $sellerTransaction = new SellerTransaction();
+                $sellerTransaction->order_id = $orderProduct->id;
+                $user_discount = User::find($order->user_id)->where('finished_after', '!=', null)->where('finished_after', '>', now())->first('discount');
+                $user_discount = $user_discount? $user_discount->discount : env('DEFAULT_DISCOUNT');
+                $product_price = $orderProduct->order_price*$orderProduct->quantity + $orderProduct->delivery_fees;
+                $sellerTransaction->amount = $product_price - ($product_price * $user_discount / 100);
+                $sellerTransaction->user_id = $order->seller_id;
+                $sellerTransaction->sign = '+';
+                $sellerTransaction->notes = 'Order payment';
+                $sellerTransaction->save();
+            }
+
             foreach ($sellerComeOrders as $sellerComeOrder) {
                 $sellerComeOrder->status = 1;
                 $sellerComeOrder->save();
