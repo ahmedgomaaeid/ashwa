@@ -101,9 +101,9 @@ class Pay
                 $sellerTransaction->order_id = $orderProduct->id;
                 $user_discount = User::find($order->user_id)->where('finished_after', '!=', null)->where('finished_after', '>', now())->first('discount');
                 $user_discount = $user_discount? $user_discount->discount : env('DEFAULT_DISCOUNT');
-                $product_price = $orderProduct->order_price*$orderProduct->quantity + $orderProduct->delivery_fees;
+                $product_price = $orderProduct->price*$orderProduct->quantity + $orderProduct->delivery_fees;
                 $sellerTransaction->amount = $product_price - ($product_price * $user_discount / 100);
-                $sellerTransaction->user_id = $order->seller_id;
+                $sellerTransaction->user_id = $orderProduct->product->user_id;
                 $sellerTransaction->sign = '+';
                 $sellerTransaction->notes = 'Order payment';
                 $sellerTransaction->save();
